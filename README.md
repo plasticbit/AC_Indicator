@@ -1,5 +1,5 @@
 # AC_Indicator
-This program causes the mouse (G403) to flash when the car's RPM reaches revolution.  
+This program causes the mouse (G403) to flash when the car's RPM reaches maximum.  
 **Written by a begginer. So if something happens, I can't take any responsibility.**
   
 # Using
