@@ -9,8 +9,6 @@ This program causes the mouse (G403) to flash when the car's RPM reaches maximum
 - You need to edit is the config.json written as `".../AssettoCorsaArxApplet.exe"` from `%USERPROFILE%\AppData\Local\LGHUB\integrations_config`.
   - Because conflict with G HUB. 
   - From `ledSdk.enable: true` to `ledSdk.enable: false`.  
-  
-  
 `config.json`
 ```
 {
@@ -22,3 +20,4 @@ This program causes the mouse (G403) to flash when the car's RPM reaches maximum
   "enabled": true, <- Change here.
   ...
 ```
+  - Then Build solution and run.
