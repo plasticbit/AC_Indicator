@@ -7,14 +7,18 @@
 
 #define physicsPath TEXT("Local\\acpmf_physics")
 #define staticPath  TEXT("Local\\acpmf_static")
+#define seekP 256
+#define seekS 452
 
-int _break = 1;
+using namespace std;
+
+int hbreak = 1;
 HANDLE physicsPtr;
 HANDLE staticPtr;
 
 int createFileMap() {
-	physicsPtr = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, O_RDWR, 0, 256, physicsPath);
-	staticPtr = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, O_RDWR, 0, 452, staticPath);
+	physicsPtr = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, O_RDWR, 0, seekP, physicsPath);
+	staticPtr = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, O_RDWR, 0, seekS, staticPath);
 
 	if (!physicsPtr || !staticPtr) return 1;
 	return 0;
@@ -23,7 +27,7 @@ int createFileMap() {
 LPVOID viewMapedFile(HANDLE fd, size_t size) {
 	LPVOID file = MapViewOfFile(fd, FILE_MAP_READ, 0, 0, size);
 	if (!file) {
-		std::cerr << "MapViewOfFile Error." << std::endl;
+		cerr << "MapViewOfFile Error." << endl;
 		exit(1);
 	}
 
@@ -36,38 +40,44 @@ void close(HANDLE h, LPVOID ptr) {
 }
 
 void endLoop(int s) {
-	std::cout << "ok";
-	_break = 0;
+	hbreak = 0;
 }
 
 int main() {
+	int major, minor, build;
 	int lerror = createFileMap();
 	if (lerror != 0) {
-		std::cerr << "Could not load MMAP." << std::endl;
+		cerr << "Could not load MMAP." << endl;
 	}
 
-	LPVOID p = viewMapedFile(physicsPtr, 256);
-	LPVOID s = viewMapedFile(staticPtr, 452);
+	LPVOID p = viewMapedFile(physicsPtr, seekP);
+	LPVOID s = viewMapedFile(staticPtr, seekS);
 
 	bool LedInitialized = LogiLedInit();
 
 	if (!LedInitialized) {
-		std::cout << "Failed Logitech library init." << std::endl;
+		cerr << "Failed Logitech library init." << endl;
 		return 1;
 	}
 
-	LogiLedSetTargetDevice(LogiLed::DeviceType::Mouse);
+	LogiLedGetSdkVersion(&major, &minor, &build);
+	cout << "Done initialize.\nSDK Version:: ";
+	cout << major << "." << minor << "." << build << endl;
+	
+	if (!LogiLedSetTargetDevice(LogiLed::DeviceType::Mouse)) {
+		cout << "Could not find the target.\nPlease edit the line #67 in LogiLed::DeviceType of main.cpp." << endl;
+	}
 
-	int *RPM = (int*)(uintptr_t(p) + uintptr_t(20));
-	int *maxRPM = (int*)(uintptr_t(s) + uintptr_t(452-40));
+	const int *const RPM = (int*)(uintptr_t(p) + uintptr_t(20));
+	const int *const maxRPM = (int*)(uintptr_t(s) + uintptr_t(412));
 	int ofstMrpm = *maxRPM - RPMoffset;
 
 	if (signal(SIGINT, endLoop) == SIG_ERR) {
-		std::cerr << "Could not receive a signal." << std::endl;
+		cerr << "Could not receive a signal." << endl;
 	}
 
-	while (_break) {
-		if (*RPM >= RPMoffset) {
+	while (hbreak) {
+		if (*RPM >= ofstMrpm) {
 			LogiLedSetLighting(OnR, OnG, OnB);
 			Sleep(OnDuration);
 			LogiLedSetLighting(OffR, OffG, OffB);
