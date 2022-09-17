@@ -5,11 +5,6 @@ VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AC_Indicator", "AC_Indicator.vcxproj", "{222F75D1-9D88-4EE6-AD05-2F9942CC517F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C34E903-E649-4DD2-AF5F-30F0EA5911F3}"
-	ProjectSection(SolutionItems) = preProject
-		gitignore.txt = gitignore.txt
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
